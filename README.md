@@ -16,7 +16,7 @@ to match a job description.
 |-- prompt.txt      # Short per-run prompt selecting a profile and JD
 |-- jd.txt          # Target job description
 |-- gen-pdf.py      # Markdown-to-PDF generator
-|-- profiles/       # Private candidate master resumes, grouped by candidate
+|-- profiles/       # Private master resumes, grouped by profile owner
 `-- outputs/        # Generated tailored Markdown resumes and PDFs
 ```
 
@@ -25,34 +25,40 @@ private candidate data, generated files, or local dependencies.
 
 ## Master Resumes
 
-Master resumes are the source of truth for tailoring. Store them under:
+Master resumes are the source of truth for tailoring. Store them under a
+user-defined profile directory:
 
 ```text
-profiles/<candidate>/<profile>.md
+profiles/<profile-owner>/<resume-focus>.md
 ```
 
-Each profile should represent a truthful role-specific view of the same
-candidate. For example, the current Jayden profiles are:
+`<profile-owner>` can be a name, alias, username, or other identifier. The
+workflow does not require a specific candidate name.
 
-| Master resume | Best used for |
-|---|---|
-| `profiles/jayden/data.md` | Data engineering and analytics roles |
-| `profiles/jayden/fullstack.md` | Full-stack and general software engineering roles |
-| `profiles/jayden/game.md` | Game development and game engine roles |
-| `profiles/jayden/mobile.md` | Mobile application roles |
-| `profiles/jayden/security.md` | Security and network engineering roles |
+Each master resume should represent a truthful role-specific view of its
+profile owner. A general profile directory might look like:
+
+```text
+profiles/
+`-- example-user/
+    |-- data-engineering.md
+    |-- full-stack.md
+    |-- mobile.md
+    `-- README.md
+```
 
 Select the profile closest to the target role. Codex may reorder, shorten, and
 reframe supported content for the JD, but it must not combine unsupported
 claims from other profiles or invent missing facts.
 
-When adding a candidate:
+When adding a profile owner:
 
-1. Create `profiles/<candidate>/`.
+1. Create `profiles/<profile-owner>/`.
 2. Add one or more role-specific Markdown master resumes.
 3. Preserve exact employers, titles, dates, technologies, achievements, and
    career breaks.
-4. Document known source ambiguities in `profiles/<candidate>/README.md`.
+4. Document known source ambiguities in
+   `profiles/<profile-owner>/README.md`.
 
 ## Codex Prompt
 
@@ -67,7 +73,7 @@ chosen master resume before each run:
 ```text
 Execute Resume Tailoring Workflow.
 
-Source: profiles/jayden/mobile.md
+Source: profiles/example-user/full-stack.md
 JD: jd.txt
 ```
 
@@ -75,7 +81,7 @@ Then ask Codex to execute the contents of `prompt.txt`. Codex should:
 
 1. Read the selected master resume and `jd.txt`.
 2. Tailor one truthful ATS-friendly resume.
-3. Save it under `outputs/<date>-<candidate>/`.
+3. Save it under `outputs/<date>-<profile-owner>/`.
 4. Run `gen-pdf.py` to create the matching PDF.
 5. Respond with a cover letter and note unsupported JD keywords or missing
    source facts that limited tailoring.
@@ -96,7 +102,7 @@ The Codex workflow runs the PDF generator automatically. To regenerate a PDF
 manually:
 
 ```powershell
-python gen-pdf.py outputs\<date>-<candidate>\<resume>.md
+python gen-pdf.py outputs\<date>-<profile-owner>\<resume>.md
 ```
 
 Specify an output path or A4 page size when needed:
@@ -112,8 +118,8 @@ The generator uses only the Python standard library.
 Generated resumes and PDFs belong in:
 
 ```text
-outputs/<date>-<candidate>/<company>-<job-title>.md
-outputs/<date>-<candidate>/<company>-<job-title>.pdf
+outputs/<date>-<profile-owner>/<company>-<job-title>.md
+outputs/<date>-<profile-owner>/<company>-<job-title>.pdf
 ```
 
 Review every generated resume before submitting it. In particular, verify that
